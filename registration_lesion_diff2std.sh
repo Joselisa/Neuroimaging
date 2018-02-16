@@ -23,7 +23,7 @@ for originalFile in *[^_lesion_mask].nii -o *[^_ROI].nii
     for roiFile in *_ROI.nii
       do
         echo Roi File is "${roiFile}";
-        fslstats ${warpedFaFile} -k $roiFile -M -S;
+        fslstats ${warpedFaFile} -k $roiFile -M -S >> ${originalFile}_${roiFile}.txt
     done
 
     echo fslstats ok!;
