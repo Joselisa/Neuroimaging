@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This script registers a ROI file (in std space) to the native space (diffusion).
-# Requirements: DWI file, lesion mask (same DWI file name as a prefix) and you ROI (suffix _ROI)
+# Requirements: DWI file, lesion mask (same DWI file name as a prefix) and you ROI (filename ROI)
 for originalFile in *[^_lesion_mask][^_ROI].nii;
     do
          echo Running "$originalFile"... ;
@@ -10,7 +10,7 @@ for originalFile in *[^_lesion_mask][^_ROI].nii;
         afflineFile=${originalFile%.nii}_affline_transf.mat;
         lesionMaskFile=${originalFile%.nii}_lesion_mask;
         warpedFAFile2MNI=${originalFile%.nii}_my_warped_fa;
-        roiFile=${originalFile%.nii}_ROI;
+        roiFile=ROI;
         nonlinear_transf=${originalFile%.nii}_my_nonlinear_transf;
         MNI2DTI=${originalFile%.nii}_MNI2DTI;
         roi_DTIspace=${originalFile%.nii}_ROI_DTI_space.nii;
