@@ -31,6 +31,6 @@ for originalFile in *[^_lesion_mask][^_ROI].nii;
         applywarp --ref=${originalFile} --in=${roiFile} --warp=${MNI2DTI} --out=${roi_DTIspace} --interp=nn;
         echo Applywarp MNI2DTI ok!
 
-        fslstats ${MNI2DTI}.nii.gz -k ${roi_DTIspace} -M -S >> ${originalFile}_${roiFile}.txt;
+        fslstats ${originalFile}.nii.gz -k ${roi_DTIspace} -M -S >> ${originalFile%.nii}_${roiFile}.txt;
         echo fslstats ok!;
 done
