@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#This script is based on Muschelli`s proposed solution for Brain Extraction in CT images.
+intensity=0.01
+
+for originalFile in *.nii;
+  do
+  	echo Running "$originalFile"...;
+
+  	# Defining file names...
+        originalFile=${originalFile%.nii};
+        thresholdedFile=${originalFile%.nii}_thr;
+        binarizedFile=${originalFile%.nii}_thr_bin;
+        filledFile=${originalFile%.nii}_thr_bin_fill;
+        smoothedFile=${originalFile%.nii}_thr_bin_fill_smooth;
+        maskedFile=${originalFile%.nii}_thr_bin_fill_smooth_mask;
+        Bet_mask=${originalFile%.nii}_bet_mask;
+        Bet_mask_filled=${originalFile%.nii}_bet_mask_filled;
+        originalFile_betted=${originalFile%.nii}_betted;
+
+    
+	# Thresholding Image to 0-100
+	echo Running thresholding "$originalFile" to 0-100...;
+
+	fslmaths ${originalFile} -thr 0.000000 -uthr 100.000000 ${thresholdedFile};
+
+	# Image is binarized and holes are filled
+	echo Binarizing "$originalFile" and filling the holes...;
+
+	fslmaths "${thresholdedFile}"  -bin   "${binarizedFile}"; 
+
+	fslmaths "${binarizedFile}" -bin -fillh "${filledFile}";
+
+	# Presmoothing image
+	echo Smoothing "$originalFile"...;
+	fslmaths "${filledFile}"  -s 1 "${smoothedFile}"; 
+
+	# Masking Smoothed Image
+	echo Masking the smoothed "$originalFile"...;
+	fslmaths "${smoothedFile}" -mas "${binarizedFile}" "${maskedFile}";  
+
+	# Running bet2
+	echo Running BET on "$originalFile";
+	bet2 "${maskedFile}" "${Bet_mask}" -f ${intensity} -v;
+
+	# Using fslfill to fill in any holes in mask 
+	echo Filling any holes in "$originalFile"...;
+	fslmaths "${Bet_mask}" -bin -fillh "${Bet_mask_filled}"; 
+
+	# Using the filled mask to mask original image
+	echo Masking "$originalFile" ...;
+	fslmaths "${originalFile}" -mas "${Bet_mask_filled}" "${originalFile_betted}";
+
+ done
